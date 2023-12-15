@@ -25,7 +25,7 @@ const RedirectToDetails = () => {
 
 function AppRouter() {
   return (
-    <React.Suspense fallback={<div>Loading...</div>}>
+    <React.Suspense fallback={<div className="center-loading">Loading...</div>}>
       <Router>
         <Routes>
           <Route path="/" element={<RedirectToDetails />} />

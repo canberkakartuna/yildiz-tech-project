@@ -1,0 +1,10 @@
+body {
+  margin: 0px;
+}
+
+.center-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
