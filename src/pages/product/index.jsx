@@ -1,14 +1,21 @@
-import React from "react";
+import { ImageGallery, ProductDetail } from "containers/product";
+import { useGetProduct } from "api/product";
 
-import { useGetProducts } from "../../api/products";
+import React from "react";
+import "./style.css";
 
 export default function Products() {
-  const { data, isLoading: isProductsLoading } = useGetProducts();
+  const { isLoading: isProductLoading } = useGetProduct();
 
-  console.log(data);
+  if (isProductLoading) return <div className="center-loading">Loading...</div>;
 
-  if (isProductsLoading)
-    return <div className="center-loading">Loading...</div>;
+  return (
+    <div className="flex-container">
+      {/* Product Image & Slider */}
+      <ImageGallery />
 
-  return <div>Products</div>;
+      {/* Product Details */}
+      <ProductDetail />
+    </div>
+  );
 }

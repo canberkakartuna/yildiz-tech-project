@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 //#region GET PRODUCTS
-const getProducts = async () => {
+const getProduct = async () => {
   const res = await fetch("/data/product.json");
   if (!res.ok) {
     throw new Error("Network response was not ok");
@@ -9,10 +9,10 @@ const getProducts = async () => {
   return res.json();
 };
 
-function useGetProducts() {
+function useGetProduct() {
   return useQuery({
-    queryKey: ["products"],
-    queryFn: getProducts,
+    queryKey: ["product"],
+    queryFn: getProduct,
     config: {
       refetchOnWindowFocus: false,
     },
@@ -20,4 +20,4 @@ function useGetProducts() {
 }
 //#endregion
 
-export { useGetProducts };
+export { useGetProduct };

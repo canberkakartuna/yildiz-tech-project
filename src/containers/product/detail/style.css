@@ -1,0 +1,29 @@
+.product-name {
+  font-size: 28px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.product-attributes {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.attribute-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.attribute-container__title_container {
+  display: flex;
+  justify-content: space-between;
+  min-width: 100px;
+  font-size: 14px;
+}
+
+.attribute-boxes {
+  display: flex;
+  gap: 16px;
+}
