@@ -20,7 +20,7 @@ export const getAttributesAvailability = (productVariants) => {
       if (!availability[attributeName][attributeValue]) {
         availability[attributeName][attributeValue] = {
           values: [],
-          ids: [],
+          images: [],
         };
       }
 
@@ -28,7 +28,7 @@ export const getAttributesAvailability = (productVariants) => {
         entry.attributes.map((item) => item.value)
       );
 
-      availability[attributeName][attributeValue].ids.push(entry.id);
+      availability[attributeName][attributeValue].images.push(entry.images);
 
       availability[attributeName][attributeValue].values =
         availability[attributeName][attributeValue].values.flat();

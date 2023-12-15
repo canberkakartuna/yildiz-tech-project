@@ -3,12 +3,56 @@ import { useGetProduct } from "api/product";
 import { getAttributesAvailability } from "utils";
 
 import classNames from "classnames";
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import "./style.css";
 
-export default function ImageGallery() {
+const ImageGallery = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  const { data: productData } = useGetProduct();
+  const { productVariants = [] } = productData || {};
+
+  const { selectedAttributes = {} } = useProductStore((state) => ({
+    selectedAttributes: state.selectedAttributes,
+  }));
+
+  const attributesAvailability = getAttributesAvailability(productVariants);
+
+  useEffect(() => {
+    if (Object.keys(selectedAttributes).length === 0) return;
+    setSelectedImageIndex(0);
+    setCurrentIndex(0);
+  }, [selectedAttributes]);
+
+  const imagesById = useMemo(
+    () =>
+      productVariants.reduce((acc, variant) => {
+        const { id, images } = variant;
+        acc[id] = images;
+        return acc;
+      }, {}),
+    [productVariants]
+  );
+
+  const imagesBasedOnSelectedAttributes = selectedAttributes
+    ? attributesAvailability[Object.keys(selectedAttributes)?.[0]]?.[
+        Object.values(selectedAttributes)?.[0]
+      ]?.images?.flat()
+    : null;
+
+  const flattenImages = useMemo(
+    () =>
+      imagesBasedOnSelectedAttributes || [
+        ...new Set(Object.values(imagesById).flat()),
+      ],
+    [imagesBasedOnSelectedAttributes, imagesById]
+  );
+
+  const displayedImages = useMemo(
+    () => flattenImages.slice(currentIndex, currentIndex + 5),
+    [flattenImages, currentIndex]
+  );
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) =>
@@ -20,43 +64,23 @@ export default function ImageGallery() {
     setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
   };
 
-  const { data: productData } = useGetProduct();
-  const { selectedAttributes = {} } = useProductStore((state) => ({
-    selectedAttributes: state.selectedAttributes,
-  }));
-
-  const { productVariants = [] } = productData || {};
-
-  const attributeAvailability = getAttributesAvailability(productVariants);
-
-  console.log("attributeAvailability", attributeAvailability);
-  console.log("selectedAttributes", selectedAttributes);
-
-  const imagesById = productVariants.reduce((acc, variant) => {
-    const { id, images } = variant;
-    acc[id] = images;
-    return acc;
-  }, {});
-
-  const flattenImages = [...new Set(Object.values(imagesById).flat())];
-  const displayedImages = flattenImages.slice(currentIndex, currentIndex + 5);
-
   return (
     <div className="image-container">
       <div className="image-gallery">
-        <img src={flattenImages[selectedImageIndex]} alt="" />
+        <img width={400} src={flattenImages[selectedImageIndex]} alt="" />
       </div>
 
       <div className="image-carousel-container">
         <button
+          className="prev-button"
           onClick={handlePrev}
           disabled={currentIndex === 0}
-          className="prev-button"
         >
           Previous
         </button>
         {displayedImages.map((image, index) => (
           <img
+            width={80}
             key={index}
             className={classNames("image-carousel", {
               "image-carousel-selected":
@@ -68,13 +92,15 @@ export default function ImageGallery() {
           />
         ))}
         <button
+          className="next-button"
           onClick={handleNext}
           disabled={currentIndex + 5 >= flattenImages.length}
-          className="next-button"
         >
           Next
         </button>
       </div>
     </div>
   );
-}
+};
+
+export default ImageGallery;

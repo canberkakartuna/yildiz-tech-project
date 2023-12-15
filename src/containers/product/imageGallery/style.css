@@ -15,8 +15,12 @@
   justify-content: center;
 }
 
+.image-gallery img {
+  max-width: 100%;
+  height: auto;
+}
+
 .image-carousel {
-  width: 80px;
   border: 2px solid #ccc;
   display: flex;
   justify-content: center;
