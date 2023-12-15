@@ -1,0 +1,36 @@
+.image-container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.image-carousel-container {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.image-gallery {
+  display: flex;
+  justify-content: center;
+}
+
+.image-carousel {
+  width: 80px;
+  border: 2px solid #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.image-carousel-selected {
+  border: 2px solid #000;
+}
+
+.prev-button,
+.next-button {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}

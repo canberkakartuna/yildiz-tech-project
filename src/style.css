@@ -1,6 +1,7 @@
 body {
-  margin: 0px;
+  margin: 0px auto;
   font-family: "Helvetica", sans-serif;
+  overflow-x: hidden;
 }
 
 .center-loading {

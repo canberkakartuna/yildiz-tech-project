@@ -1,8 +1,8 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { AttributeBox } from "components";
 import { useGetProduct } from "api/product";
 import useProductStore from "stores/product";
-import { formatPrice } from "utils";
+import { formatPrice, getAttributesAvailability } from "utils";
 import "./style.css";
 
 const Detail = () => {
@@ -13,8 +13,6 @@ const Detail = () => {
     productTitle = "",
     productVariants = [],
   } = productData || {};
-
-  console.log("selectableAttributes", selectableAttributes);
 
   const { selectedAttributes = {} } = useProductStore((state) => ({
     selectedAttributes: state.selectedAttributes,
@@ -27,38 +25,7 @@ const Detail = () => {
     Math.max(...baremList.map((item) => item.price))
   );
 
-  const attributeAvailability = useMemo(() => {
-    const availability = {};
-
-    productVariants.forEach((entry) => {
-      entry.attributes.forEach((attribute) => {
-        const attributeName = attribute.name;
-        const attributeValue = attribute.value;
-
-        if (!availability[attributeName]) {
-          availability[attributeName] = {};
-        }
-
-        if (!availability[attributeName][attributeValue]) {
-          availability[attributeName][attributeValue] = [];
-        }
-
-        availability[attributeName][attributeValue].push(
-          entry.attributes.map((item) => item.value)
-        );
-
-        availability[attributeName][attributeValue] =
-          availability[attributeName][attributeValue].flat();
-
-        // remove attribute value
-        availability[attributeName][attributeValue] = availability[
-          attributeName
-        ][attributeValue].filter((item) => item !== attributeValue);
-      });
-    });
-
-    return availability;
-  }, [productVariants]);
+  const attributeAvailability = getAttributesAvailability(productVariants);
 
   return (
     <div>
@@ -90,24 +57,32 @@ const Detail = () => {
             </div>
 
             <div className="attribute-boxes">
-              {attribute?.values.map((value) => (
-                <AttributeBox
-                  key={value}
-                  name={value}
-                  group={attribute.name}
-                  disabled={
-                    attribute.name !== Object.keys(selectedAttributes)[0] &&
-                    attributeAvailability[attribute.name] &&
-                    attributeAvailability[Object.keys(selectedAttributes)[0]] &&
-                    attributeAvailability[Object.keys(selectedAttributes)[0]][
-                      Object.values(selectedAttributes)[0]
-                    ] &&
-                    !attributeAvailability[Object.keys(selectedAttributes)[0]][
-                      Object.values(selectedAttributes)[0]
-                    ].includes(value)
-                  }
-                />
-              ))}
+              {attribute?.values.map((value) => {
+                const firstSelectedAttribute =
+                  Object.keys(selectedAttributes)[0];
+                const firstSelectedAttributeValue =
+                  Object.values(selectedAttributes)[0];
+
+                const isDisableConditionMet =
+                  attribute.name !== firstSelectedAttribute &&
+                  attributeAvailability[attribute.name] &&
+                  attributeAvailability[firstSelectedAttribute] &&
+                  attributeAvailability[firstSelectedAttribute][
+                    firstSelectedAttributeValue
+                  ] &&
+                  !attributeAvailability[firstSelectedAttribute][
+                    firstSelectedAttributeValue
+                  ].values.includes(value);
+
+                return (
+                  <AttributeBox
+                    key={value}
+                    name={value}
+                    group={attribute.name}
+                    disabled={isDisableConditionMet}
+                  />
+                );
+              })}
             </div>
           </div>
         ))}

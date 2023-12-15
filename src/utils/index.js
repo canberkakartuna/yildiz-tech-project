@@ -5,16 +5,40 @@ export const formatPrice = (price) => {
   });
 };
 
-export const filterArrayByAttributes = (inputArray, inputObject) => {
-  return inputArray.filter((product) => {
-    const attributes = product.attributes;
+export const getAttributesAvailability = (productVariants) => {
+  const availability = {};
 
-    // Check if all attributes in the product match the inputObject
-    return Object.keys(inputObject).every((key) => {
-      const inputValue = inputObject[key];
-      return attributes.some((attribute) => {
-        return attribute.name === key && attribute.value === inputValue;
-      });
+  productVariants.forEach((entry) => {
+    entry.attributes.forEach((attribute) => {
+      const attributeName = attribute.name;
+      const attributeValue = attribute.value;
+
+      if (!availability[attributeName]) {
+        availability[attributeName] = {};
+      }
+
+      if (!availability[attributeName][attributeValue]) {
+        availability[attributeName][attributeValue] = {
+          values: [],
+          ids: [],
+        };
+      }
+
+      availability[attributeName][attributeValue].values.push(
+        entry.attributes.map((item) => item.value)
+      );
+
+      availability[attributeName][attributeValue].ids.push(entry.id);
+
+      availability[attributeName][attributeValue].values =
+        availability[attributeName][attributeValue].values.flat();
+
+      // remove attribute value
+      availability[attributeName][attributeValue].values = availability[
+        attributeName
+      ][attributeValue].values.filter((item) => item !== attributeValue);
     });
   });
+
+  return availability;
 };
