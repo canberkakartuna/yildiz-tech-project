@@ -34,3 +34,26 @@
   display: flex;
   gap: 16px;
 }
+
+.checkout-button {
+  background-color: rgb(240, 167, 23);
+  color: #fff;
+  border: none;
+  padding: 14px 40px;
+  font-size: 16px;
+  border-radius: 4px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.barem-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-right: 1px solid #c5c5c5;
+  padding-right: 16px;
+}
+
+.barem-box:last-child {
+  border-right: none;
+}

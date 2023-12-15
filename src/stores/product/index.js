@@ -14,6 +14,8 @@ const useProductStore = create((set) => ({
 
       return { selectedAttributes: newAttributes };
     }),
+  quantity: null,
+  setQuantity: (quantity) => set({ quantity }),
 }));
 
 export default useProductStore;
