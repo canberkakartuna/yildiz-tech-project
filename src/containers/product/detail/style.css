@@ -46,12 +46,27 @@
   text-transform: uppercase;
 }
 
+.checkout-button:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.checkout-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .barem-box {
   display: flex;
   flex-direction: column;
   gap: 8px;
   border-right: 1px solid #c5c5c5;
   padding-right: 16px;
+  padding: 4px;
+}
+
+.barem-box__selected {
+  background-color: rgba(248, 193, 83, 0.878);
 }
 
 .barem-box:last-child {

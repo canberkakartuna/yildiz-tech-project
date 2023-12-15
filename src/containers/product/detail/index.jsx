@@ -1,11 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { AttributeBox } from "components";
 import { useGetProduct } from "api/product";
 import useProductStore from "stores/product";
 import { formatPrice, getAttributesAvailability } from "utils";
+import classNames from "classnames";
 import "./style.css";
 
 const Detail = () => {
+  const [quantityValue, setQuantityValue] = useState(0);
+
   const { data: productData } = useGetProduct();
   const {
     baremList = [],
@@ -39,7 +42,16 @@ const Detail = () => {
     setQuantity(baremList[0].minimumQuantity);
   }, [baremList]);
 
-  console.log(quantity);
+  const checkoutButtonDisabled = useMemo(() => {
+    const selectedAttributesKeys = Object.keys(selectedAttributes);
+    const allAttributesSelected =
+      selectedAttributesKeys.length === selectableAttributes.length &&
+      selectedAttributesKeys.every((key) =>
+        selectableAttributes.find((attr) => attr.name === key)
+      );
+
+    return !(allAttributesSelected && quantityValue >= quantity);
+  }, [selectedAttributes, selectableAttributes, quantityValue, quantity]);
 
   return (
     <div>
@@ -136,7 +148,14 @@ const Detail = () => {
 
           <div className="attribute-boxes">
             {baremList.map((barem, index) => (
-              <div className="barem-box" key={index}>
+              <div
+                className={classNames("barem-box", {
+                  "barem-box__selected":
+                    barem.minimumQuantity <= quantityValue &&
+                    barem.maximumQuantity >= quantityValue,
+                })}
+                key={index}
+              >
                 <div>
                   <span className="barem-box__min">
                     {barem.minimumQuantity}
@@ -172,6 +191,8 @@ const Detail = () => {
                 height: 32,
                 width: 100,
               }}
+              value={quantityValue}
+              onChange={(e) => setQuantityValue(e.target.value)}
             />
             <span
               style={{
@@ -202,7 +223,13 @@ const Detail = () => {
           className="attribute-boxes"
           style={{ fontWeight: "bold", fontSize: 26 }}
         >
-          {formatPrice(123)}
+          {formatPrice(
+            baremList.find(
+              (barem) =>
+                barem.minimumQuantity <= quantityValue &&
+                barem.maximumQuantity >= quantityValue
+            )?.price * quantityValue || 0
+          )}
         </div>
       </div>
 
@@ -211,7 +238,31 @@ const Detail = () => {
         <div className="attribute-container__title_container" />
 
         <div className="attribute-boxes">
-          <button className="checkout-button">Sepete Ekle</button>
+          <button
+            className="checkout-button"
+            disabled={checkoutButtonDisabled}
+            onClick={() => {
+              console.log(
+                `${quantityValue} adet ${productTitle} ${
+                  baremList.find(
+                    (barem) =>
+                      barem.minimumQuantity <= quantityValue &&
+                      barem.maximumQuantity >= quantityValue
+                  )?.price
+                } fiyatıyla sepete eklendi. Bu ürünün toplam fiyatı ${
+                  baremList.find(
+                    (barem) =>
+                      barem.minimumQuantity <= quantityValue &&
+                      barem.maximumQuantity >= quantityValue
+                  )?.price * quantityValue
+                }. Bu ürünün özellikleri: ${Object.keys(selectedAttributes)
+                  .map((key) => `${key}: ${selectedAttributes[key]}`)
+                  .join(", ")}`
+              );
+            }}
+          >
+            Sepete Ekle
+          </button>
         </div>
       </div>
     </div>
