@@ -1,13 +1,24 @@
+import React, { useMemo } from "react";
 import { AttributeBox } from "components";
 import { useGetProduct } from "api/product";
+import useProductStore from "stores/product";
 import { formatPrice } from "utils";
-
-import React from "react";
 import "./style.css";
 
-export default function Detail() {
+const Detail = () => {
   const { data: productData } = useGetProduct();
-  const { baremList, selectableAttributes } = productData || {};
+  const {
+    baremList = [],
+    selectableAttributes = [],
+    productTitle = "",
+    productVariants = [],
+  } = productData || {};
+
+  console.log("selectableAttributes", selectableAttributes);
+
+  const { selectedAttributes = {} } = useProductStore((state) => ({
+    selectedAttributes: state.selectedAttributes,
+  }));
 
   const minPrice = formatPrice(
     Math.min(...baremList.map((item) => item.price))
@@ -16,12 +27,43 @@ export default function Detail() {
     Math.max(...baremList.map((item) => item.price))
   );
 
-  console.log(productData);
+  const attributeAvailability = useMemo(() => {
+    const availability = {};
+
+    productVariants.forEach((entry) => {
+      entry.attributes.forEach((attribute) => {
+        const attributeName = attribute.name;
+        const attributeValue = attribute.value;
+
+        if (!availability[attributeName]) {
+          availability[attributeName] = {};
+        }
+
+        if (!availability[attributeName][attributeValue]) {
+          availability[attributeName][attributeValue] = [];
+        }
+
+        availability[attributeName][attributeValue].push(
+          entry.attributes.map((item) => item.value)
+        );
+
+        availability[attributeName][attributeValue] =
+          availability[attributeName][attributeValue].flat();
+
+        // remove attribute value
+        availability[attributeName][attributeValue] = availability[
+          attributeName
+        ][attributeValue].filter((item) => item !== attributeValue);
+      });
+    });
+
+    return availability;
+  }, [productVariants]);
 
   return (
     <div>
       {/* Product Name */}
-      <span className="product-name">{productData.productTitle}</span>
+      <span className="product-name">{productTitle}</span>
 
       {/* Product Price */}
       <div className="product-price">
@@ -48,8 +90,23 @@ export default function Detail() {
             </div>
 
             <div className="attribute-boxes">
-              {attribute.values.map((value) => (
-                <AttributeBox key={value} name={value} group={attribute.name} />
+              {attribute?.values.map((value) => (
+                <AttributeBox
+                  key={value}
+                  name={value}
+                  group={attribute.name}
+                  disabled={
+                    attribute.name !== Object.keys(selectedAttributes)[0] &&
+                    attributeAvailability[attribute.name] &&
+                    attributeAvailability[Object.keys(selectedAttributes)[0]] &&
+                    attributeAvailability[Object.keys(selectedAttributes)[0]][
+                      Object.values(selectedAttributes)[0]
+                    ] &&
+                    !attributeAvailability[Object.keys(selectedAttributes)[0]][
+                      Object.values(selectedAttributes)[0]
+                    ].includes(value)
+                  }
+                />
               ))}
             </div>
           </div>
@@ -57,4 +114,6 @@ export default function Detail() {
       </div>
     </div>
   );
-}
+};
+
+export default Detail;

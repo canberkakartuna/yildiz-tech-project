@@ -1,4 +1,5 @@
 .attribute-box {
+  cursor: pointer;
   padding: 8px 32px;
   border: 2px solid #ccc;
   font-size: 16px;
@@ -9,4 +10,11 @@
 .attribute-box__selected {
   border: 2px solid #000;
   color: rgba(0, 0, 0);
+}
+
+.attribute-box__disabled {
+  cursor: not-allowed;
+  border: 2px solid #ccc;
+  color: rgba(0, 0, 0, 0.7);
+  background-color: #ccc;
 }

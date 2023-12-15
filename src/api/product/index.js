@@ -13,9 +13,6 @@ function useGetProduct() {
   return useQuery({
     queryKey: ["product"],
     queryFn: getProduct,
-    config: {
-      refetchOnWindowFocus: false,
-    },
   });
 }
 //#endregion
